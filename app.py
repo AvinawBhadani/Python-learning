@@ -17,14 +17,19 @@ app = Flask(__name__)
     #)
     #return resp
 
-@app.route("/calc")
+@app.route("/calc", methods=["POST"])
 def calculate():
-    a = request.args.get("a", type=float)
-    b = request.args.get("b", type=float)
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "JSON body required"}), 400
+    
+    a = data.get("a")
+    b = data.get("b")
     operation = request.args.get("op")
+    operation = data.get("op")
 
     if a is None or b is None or not operation:
-        return "Provide a, b and op parameters", 400
+        return jsonify({"error": "a, b and op are required"}), 400
 
     calc = Calc(a, b)
 
@@ -39,17 +44,14 @@ def calculate():
     elif operation == "avg":
         result = calc.average()
     else:
-        return "Invalid operation", 400
+        return jsonify({"error": "Invalid operation"}), 400
 
     return jsonify({
         "a": a,
         "b": b,
         "operation": operation,
         "result": result
-    })
+    }) , 200
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-# REST - JSON

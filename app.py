@@ -47,8 +47,6 @@ def calculate():
             result = calc.average()
         else:
             return jsonify({"error": "Invalid operation"}), 400
-
-   
             print(error)
         return jsonify({
             "a": a,

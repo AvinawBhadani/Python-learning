@@ -19,39 +19,48 @@ app = Flask(__name__)
 
 @app.route("/calc", methods=["POST"])
 def calculate():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "JSON body required"}), 400
+    try:
+        print(c)
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "JSON body required"}), 400
+        
+        a = data.get("a")
+        b = data.get("b")
+        operation = request.args.get("op")
+        operation = data.get("op")
+
+        if a is None or b is None or not operation:
+            return jsonify({"error": "a, b and op are required"}), 400
+
+        calc = Calc(a, b)
+
+        if operation == "add":
+            result = calc.add()
+        elif operation == "sub":
+            result = calc.sub()
+        elif operation == "mul":
+            result = calc.multiply()
+        elif operation == "div":
+            result = calc.divide()
+        elif operation == "avg":
+            result = calc.average()
+        else:
+            return jsonify({"error": "Invalid operation"}), 400
+
+   
+            print(error)
+        return jsonify({
+            "a": a,
+            "b": b,
+            "operation": operation,
+            "result": result
+        }) , 200
+    except Exception as error:
+        print(error)
+        return jsonify({
+            "error": str(error)
+        }) , 200
     
-    a = data.get("a")
-    b = data.get("b")
-    operation = request.args.get("op")
-    operation = data.get("op")
-
-    if a is None or b is None or not operation:
-        return jsonify({"error": "a, b and op are required"}), 400
-
-    calc = Calc(a, b)
-
-    if operation == "add":
-        result = calc.add()
-    elif operation == "sub":
-        result = calc.sub()
-    elif operation == "mul":
-        result = calc.multiply()
-    elif operation == "div":
-        result = calc.divide()
-    elif operation == "avg":
-        result = calc.average()
-    else:
-        return jsonify({"error": "Invalid operation"}), 400
-
-    return jsonify({
-        "a": a,
-        "b": b,
-        "operation": operation,
-        "result": result
-    }) , 200
-
 if __name__ == "__main__":
     app.run(debug=True)
